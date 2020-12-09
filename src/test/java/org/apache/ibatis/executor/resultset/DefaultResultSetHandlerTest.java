@@ -1,36 +1,19 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.executor.resultset;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.executor.Executor;
@@ -51,6 +34,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultResultSetHandlerTest {
@@ -107,7 +107,7 @@ class DefaultResultSetHandlerTest {
     final RowBounds rowBounds = new RowBounds(0, 100);
 
     final DefaultResultSetHandler defaultResultSetHandler = new DefaultResultSetHandler(null/*executor*/, ms,
-            null/*parameterHandler*/, null/*resultHandler*/, null/*boundSql*/, rowBounds);
+      null/*parameterHandler*/, null/*resultHandler*/, null/*boundSql*/, rowBounds);
 
     final ResultSetWrapper rsw = mock(ResultSetWrapper.class);
     when(rsw.getResultSet()).thenReturn(mock(ResultSet.class));
@@ -121,7 +121,7 @@ class DefaultResultSetHandlerTest {
 
     try {
       defaultResultSetHandler.createParameterizedResultObject(rsw, null/*resultType*/, constructorMappings,
-              null/*constructorArgTypes*/, null/*constructorArgs*/, null/*columnPrefix*/);
+        null/*constructorArgTypes*/, null/*constructorArgs*/, null/*columnPrefix*/);
       Assertions.fail("Should have thrown ExecutorException");
     } catch (Exception e) {
       Assertions.assertTrue(e instanceof ExecutorException, "Expected ExecutorException");
@@ -133,15 +133,15 @@ class DefaultResultSetHandlerTest {
     final Configuration config = new Configuration();
     final TypeHandlerRegistry registry = config.getTypeHandlerRegistry();
     return new MappedStatement.Builder(config, "testSelect", new StaticSqlSource(config, "some select statement"), SqlCommandType.SELECT).resultMaps(
-        new ArrayList<ResultMap>() {
-          {
-            add(new ResultMap.Builder(config, "testMap", HashMap.class, new ArrayList<ResultMapping>() {
-              {
-                add(new ResultMapping.Builder(config, "cOlUmN1", "CoLuMn1", registry.getTypeHandler(Integer.class)).build());
-              }
-            }).build());
-          }
-        }).build();
+      new ArrayList<ResultMap>() {
+        {
+          add(new ResultMap.Builder(config, "testMap", HashMap.class, new ArrayList<ResultMapping>() {
+            {
+              add(new ResultMapping.Builder(config, "cOlUmN1", "CoLuMn1", registry.getTypeHandler(Integer.class)).build());
+            }
+          }).build());
+        }
+      }).build();
   }
 
 }

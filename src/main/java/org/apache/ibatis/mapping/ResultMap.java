@@ -1,19 +1,26 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2019 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.mapping;
+
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.builder.BuilderException;
+import org.apache.ibatis.logging.Log;
+import org.apache.ibatis.logging.LogFactory;
+import org.apache.ibatis.reflection.ParamNameUtil;
+import org.apache.ibatis.session.Configuration;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -23,13 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.builder.BuilderException;
-import org.apache.ibatis.logging.Log;
-import org.apache.ibatis.logging.LogFactory;
-import org.apache.ibatis.reflection.ParamNameUtil;
-import org.apache.ibatis.session.Configuration;
 
 /**
  * @author Clinton Begin
@@ -53,10 +53,62 @@ public class ResultMap {
   private ResultMap() {
   }
 
+  public String getId() {
+    return id;
+  }
+
+  public boolean hasNestedResultMaps() {
+    return hasNestedResultMaps;
+  }
+
+  public boolean hasNestedQueries() {
+    return hasNestedQueries;
+  }
+
+  public Class<?> getType() {
+    return type;
+  }
+
+  public List<ResultMapping> getResultMappings() {
+    return resultMappings;
+  }
+
+  public List<ResultMapping> getConstructorResultMappings() {
+    return constructorResultMappings;
+  }
+
+  public List<ResultMapping> getPropertyResultMappings() {
+    return propertyResultMappings;
+  }
+
+  public List<ResultMapping> getIdResultMappings() {
+    return idResultMappings;
+  }
+
+  public Set<String> getMappedColumns() {
+    return mappedColumns;
+  }
+
+  public Set<String> getMappedProperties() {
+    return mappedProperties;
+  }
+
+  public Discriminator getDiscriminator() {
+    return discriminator;
+  }
+
+  public void forceNestedResultMaps() {
+    hasNestedResultMaps = true;
+  }
+
+  public Boolean getAutoMapping() {
+    return autoMapping;
+  }
+
   public static class Builder {
     private static final Log log = LogFactory.getLog(Builder.class);
 
-    private ResultMap resultMap = new ResultMap();
+    private final ResultMap resultMap = new ResultMap();
 
     public Builder(Configuration configuration, String id, Class<?> type, List<ResultMapping> resultMappings) {
       this(configuration, id, type, resultMappings, null);
@@ -126,9 +178,9 @@ public class ResultMap {
         final List<String> actualArgNames = argNamesOfMatchingConstructor(constructorArgNames);
         if (actualArgNames == null) {
           throw new BuilderException("Error in result map '" + resultMap.id
-              + "'. Failed to find a constructor in '"
-              + resultMap.getType().getName() + "' by arg names " + constructorArgNames
-              + ". There might be more info in debug log.");
+            + "'. Failed to find a constructor in '"
+            + resultMap.getType().getName() + "' by arg names " + constructorArgNames
+            + ". There might be more info in debug log.");
         }
         resultMap.constructorResultMappings.sort((o1, o2) -> {
           int paramIdx1 = actualArgNames.indexOf(o1.getProperty());
@@ -152,7 +204,7 @@ public class ResultMap {
         if (constructorArgNames.size() == paramTypes.length) {
           List<String> paramNames = getArgNames(constructor);
           if (constructorArgNames.containsAll(paramNames)
-              && argTypesMatch(constructorArgNames, paramTypes, paramNames)) {
+            && argTypesMatch(constructorArgNames, paramTypes, paramNames)) {
             return paramNames;
           }
         }
@@ -161,17 +213,17 @@ public class ResultMap {
     }
 
     private boolean argTypesMatch(final List<String> constructorArgNames,
-        Class<?>[] paramTypes, List<String> paramNames) {
+                                  Class<?>[] paramTypes, List<String> paramNames) {
       for (int i = 0; i < constructorArgNames.size(); i++) {
         Class<?> actualType = paramTypes[paramNames.indexOf(constructorArgNames.get(i))];
         Class<?> specifiedType = resultMap.constructorResultMappings.get(i).getJavaType();
         if (!actualType.equals(specifiedType)) {
           if (log.isDebugEnabled()) {
             log.debug("While building result map '" + resultMap.id
-                + "', found a constructor with arg names " + constructorArgNames
-                + ", but the type of '" + constructorArgNames.get(i)
-                + "' did not match. Specified: [" + specifiedType.getName() + "] Declared: ["
-                + actualType.getName() + "]");
+              + "', found a constructor with arg names " + constructorArgNames
+              + ", but the type of '" + constructorArgNames.get(i)
+              + "' did not match. Specified: [" + specifiedType.getName() + "] Declared: ["
+              + actualType.getName() + "]");
           }
           return false;
         }
@@ -204,58 +256,6 @@ public class ResultMap {
       }
       return paramNames;
     }
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public boolean hasNestedResultMaps() {
-    return hasNestedResultMaps;
-  }
-
-  public boolean hasNestedQueries() {
-    return hasNestedQueries;
-  }
-
-  public Class<?> getType() {
-    return type;
-  }
-
-  public List<ResultMapping> getResultMappings() {
-    return resultMappings;
-  }
-
-  public List<ResultMapping> getConstructorResultMappings() {
-    return constructorResultMappings;
-  }
-
-  public List<ResultMapping> getPropertyResultMappings() {
-    return propertyResultMappings;
-  }
-
-  public List<ResultMapping> getIdResultMappings() {
-    return idResultMappings;
-  }
-
-  public Set<String> getMappedColumns() {
-    return mappedColumns;
-  }
-
-  public Set<String> getMappedProperties() {
-    return mappedProperties;
-  }
-
-  public Discriminator getDiscriminator() {
-    return discriminator;
-  }
-
-  public void forceNestedResultMaps() {
-    hasNestedResultMaps = true;
-  }
-
-  public Boolean getAutoMapping() {
-    return autoMapping;
   }
 
 }

@@ -1,25 +1,19 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.submitted.cache;
-
-import static com.googlecode.catchexception.apis.BDDCatchException.*;
-import static org.assertj.core.api.BDDAssertions.then;
-
-import java.io.Reader;
-import java.lang.reflect.Field;
 
 import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.annotations.CacheNamespace;
@@ -36,6 +30,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.Reader;
+import java.lang.reflect.Field;
+
+import static com.googlecode.catchexception.apis.BDDCatchException.caughtException;
+import static com.googlecode.catchexception.apis.BDDCatchException.when;
+import static org.assertj.core.api.BDDAssertions.then;
+
 // issue #524
 class CacheTest {
 
@@ -50,7 +51,7 @@ class CacheTest {
 
     // populate in-memory database
     BaseDataTest.runScript(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource(),
-            "org/apache/ibatis/submitted/cache/CreateDB.sql");
+      "org/apache/ibatis/submitted/cache/CreateDB.sql");
   }
 
   /*
@@ -293,7 +294,7 @@ class CacheTest {
       .hasMessage("Should be specified either value() or name() attribute in the @CacheNamespaceRef");
   }
 
-  private CustomCache unwrap(Cache cache){
+  private CustomCache unwrap(Cache cache) {
     Field field;
     try {
       field = cache.getClass().getDeclaredField("delegate");
@@ -302,7 +303,7 @@ class CacheTest {
     }
     try {
       field.setAccessible(true);
-      return (CustomCache)field.get(cache);
+      return (CustomCache) field.get(cache);
     } catch (IllegalAccessException e) {
       throw new IllegalStateException(e);
     } finally {
@@ -311,7 +312,7 @@ class CacheTest {
   }
 
   @CacheNamespace(implementation = CustomCache.class, properties = {
-      @Property(name = "date", value = "2016/11/21")
+    @Property(name = "date", value = "2016/11/21")
   })
   private interface CustomCacheUnsupportedPropertyMapper {
   }

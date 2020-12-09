@@ -1,29 +1,19 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.parsing;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.io.Resources;
@@ -31,8 +21,17 @@ import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class XPathParserTest {
-  private String resource = "resources/nodelet_test.xml";
+  private final String resource = "resources/nodelet_test.xml";
 
   // InputStream Source
   @Test
@@ -179,10 +178,6 @@ class XPathParserTest {
     }
   }
 
-  enum EnumTest {
-    YES, NO
-  }
-
   private void testEvalMethod(XPathParser parser) {
     assertEquals((Long) 1970L, parser.evalLong("/employee/birth_date/year"));
     assertEquals((Long) 1970L, parser.evalNode("/employee/birth_date/year").getLongBody());
@@ -220,40 +215,44 @@ class XPathParserTest {
 
     String usersNodeToStringExpect =
       "<users>\n" +
-      "    <user>\n" +
-      "        <id>100</id>\n" +
-      "        <name>Tom</name>\n" +
-      "        <age>30</age>\n" +
-      "        <cars>\n" +
-      "            <car index=\"1\">BMW</car>\n" +
-      "            <car index=\"2\">Audi</car>\n" +
-      "            <car index=\"3\">Benz</car>\n" +
-      "        </cars>\n" +
-      "    </user>\n" +
-      "</users>\n";
+        "    <user>\n" +
+        "        <id>100</id>\n" +
+        "        <name>Tom</name>\n" +
+        "        <age>30</age>\n" +
+        "        <cars>\n" +
+        "            <car index=\"1\">BMW</car>\n" +
+        "            <car index=\"2\">Audi</car>\n" +
+        "            <car index=\"3\">Benz</car>\n" +
+        "        </cars>\n" +
+        "    </user>\n" +
+        "</users>\n";
 
     String userNodeToStringExpect =
       "<user>\n" +
-      "    <id>100</id>\n" +
-      "    <name>Tom</name>\n" +
-      "    <age>30</age>\n" +
-      "    <cars>\n" +
-      "        <car index=\"1\">BMW</car>\n" +
-      "        <car index=\"2\">Audi</car>\n" +
-      "        <car index=\"3\">Benz</car>\n" +
-      "    </cars>\n" +
-      "</user>\n";
+        "    <id>100</id>\n" +
+        "    <name>Tom</name>\n" +
+        "    <age>30</age>\n" +
+        "    <cars>\n" +
+        "        <car index=\"1\">BMW</car>\n" +
+        "        <car index=\"2\">Audi</car>\n" +
+        "        <car index=\"3\">Benz</car>\n" +
+        "    </cars>\n" +
+        "</user>\n";
 
-  String carsNodeToStringExpect =
+    String carsNodeToStringExpect =
       "<cars>\n" +
-      "    <car index=\"1\">BMW</car>\n" +
-      "    <car index=\"2\">Audi</car>\n" +
-      "    <car index=\"3\">Benz</car>\n" +
-      "</cars>\n";
+        "    <car index=\"1\">BMW</car>\n" +
+        "    <car index=\"2\">Audi</car>\n" +
+        "    <car index=\"3\">Benz</car>\n" +
+        "</cars>\n";
 
     assertEquals(usersNodeToStringExpect, usersNodeToString);
     assertEquals(userNodeToStringExpect, userNodeToString);
     assertEquals(carsNodeToStringExpect, carsNodeToString);
+  }
+
+  enum EnumTest {
+    YES, NO
   }
 
 }

@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.jdbc;
 
@@ -50,8 +50,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Sets the.
    *
-   * @param sets
-   *          the sets
+   * @param sets the sets
    * @return the t
    * @since 3.4.2
    */
@@ -75,8 +74,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Into columns.
    *
-   * @param columns
-   *          the columns
+   * @param columns the columns
    * @return the t
    * @since 3.4.2
    */
@@ -88,8 +86,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Into values.
    *
-   * @param values
-   *          the values
+   * @param values the values
    * @return the t
    * @since 3.4.2
    */
@@ -108,8 +105,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Select.
    *
-   * @param columns
-   *          the columns
+   * @param columns the columns
    * @return the t
    * @since 3.4.2
    */
@@ -128,8 +124,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Select distinct.
    *
-   * @param columns
-   *          the columns
+   * @param columns the columns
    * @return the t
    * @since 3.4.2
    */
@@ -153,8 +148,7 @@ public abstract class AbstractSQL<T> {
   /**
    * From.
    *
-   * @param tables
-   *          the tables
+   * @param tables the tables
    * @return the t
    * @since 3.4.2
    */
@@ -171,8 +165,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Join.
    *
-   * @param joins
-   *          the joins
+   * @param joins the joins
    * @return the t
    * @since 3.4.2
    */
@@ -189,8 +182,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Inner join.
    *
-   * @param joins
-   *          the joins
+   * @param joins the joins
    * @return the t
    * @since 3.4.2
    */
@@ -207,8 +199,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Left outer join.
    *
-   * @param joins
-   *          the joins
+   * @param joins the joins
    * @return the t
    * @since 3.4.2
    */
@@ -225,8 +216,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Right outer join.
    *
-   * @param joins
-   *          the joins
+   * @param joins the joins
    * @return the t
    * @since 3.4.2
    */
@@ -243,8 +233,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Outer join.
    *
-   * @param joins
-   *          the joins
+   * @param joins the joins
    * @return the t
    * @since 3.4.2
    */
@@ -262,8 +251,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Where.
    *
-   * @param conditions
-   *          the conditions
+   * @param conditions the conditions
    * @return the t
    * @since 3.4.2
    */
@@ -291,8 +279,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Group by.
    *
-   * @param columns
-   *          the columns
+   * @param columns the columns
    * @return the t
    * @since 3.4.2
    */
@@ -310,8 +297,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Having.
    *
-   * @param conditions
-   *          the conditions
+   * @param conditions the conditions
    * @return the t
    * @since 3.4.2
    */
@@ -329,8 +315,7 @@ public abstract class AbstractSQL<T> {
   /**
    * Order by.
    *
-   * @param columns
-   *          the columns
+   * @param columns the columns
    * @return the t
    * @since 3.4.2
    */
@@ -499,44 +484,6 @@ public abstract class AbstractSQL<T> {
 
   private static class SQLStatement {
 
-    public enum StatementType {
-      DELETE, INSERT, SELECT, UPDATE
-    }
-
-    private enum LimitingRowsStrategy {
-      NOP {
-        @Override
-        protected void appendClause(SafeAppendable builder, String offset, String limit) {
-          // NOP
-        }
-      },
-      ISO {
-        @Override
-        protected void appendClause(SafeAppendable builder, String offset, String limit) {
-          if (offset != null) {
-            builder.append(" OFFSET ").append(offset).append(" ROWS");
-          }
-          if (limit != null) {
-            builder.append(" FETCH FIRST ").append(limit).append(" ROWS ONLY");
-          }
-        }
-      },
-      OFFSET_LIMIT {
-        @Override
-        protected void appendClause(SafeAppendable builder, String offset, String limit) {
-          if (limit != null) {
-            builder.append(" LIMIT ").append(limit);
-          }
-          if (offset != null) {
-            builder.append(" OFFSET ").append(offset);
-          }
-        }
-      };
-
-      protected abstract void appendClause(SafeAppendable builder, String offset, String limit);
-
-    }
-
     StatementType statementType;
     List<String> sets = new ArrayList<>();
     List<String> select = new ArrayList<>();
@@ -665,6 +612,44 @@ public abstract class AbstractSQL<T> {
       }
 
       return answer;
+    }
+
+    public enum StatementType {
+      DELETE, INSERT, SELECT, UPDATE
+    }
+
+    private enum LimitingRowsStrategy {
+      NOP {
+        @Override
+        protected void appendClause(SafeAppendable builder, String offset, String limit) {
+          // NOP
+        }
+      },
+      ISO {
+        @Override
+        protected void appendClause(SafeAppendable builder, String offset, String limit) {
+          if (offset != null) {
+            builder.append(" OFFSET ").append(offset).append(" ROWS");
+          }
+          if (limit != null) {
+            builder.append(" FETCH FIRST ").append(limit).append(" ROWS ONLY");
+          }
+        }
+      },
+      OFFSET_LIMIT {
+        @Override
+        protected void appendClause(SafeAppendable builder, String offset, String limit) {
+          if (limit != null) {
+            builder.append(" LIMIT ").append(limit);
+          }
+          if (offset != null) {
+            builder.append(" OFFSET ").append(offset);
+          }
+        }
+      };
+
+      protected abstract void appendClause(SafeAppendable builder, String offset, String limit);
+
     }
   }
 }

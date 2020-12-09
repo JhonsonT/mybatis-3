@@ -1,23 +1,19 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.mapping;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
@@ -27,6 +23,10 @@ import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Clinton Begin
@@ -61,8 +61,140 @@ public final class MappedStatement {
     // constructor disabled
   }
 
+  private static String[] delimitedStringToArray(String in) {
+    if (in == null || in.trim().length() == 0) {
+      return null;
+    } else {
+      return in.split(",");
+    }
+  }
+
+  public KeyGenerator getKeyGenerator() {
+    return keyGenerator;
+  }
+
+  public SqlCommandType getSqlCommandType() {
+    return sqlCommandType;
+  }
+
+  public String getResource() {
+    return resource;
+  }
+
+  public Configuration getConfiguration() {
+    return configuration;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public boolean hasNestedResultMaps() {
+    return hasNestedResultMaps;
+  }
+
+  public Integer getFetchSize() {
+    return fetchSize;
+  }
+
+  public Integer getTimeout() {
+    return timeout;
+  }
+
+  public StatementType getStatementType() {
+    return statementType;
+  }
+
+  public ResultSetType getResultSetType() {
+    return resultSetType;
+  }
+
+  public SqlSource getSqlSource() {
+    return sqlSource;
+  }
+
+  public ParameterMap getParameterMap() {
+    return parameterMap;
+  }
+
+  public List<ResultMap> getResultMaps() {
+    return resultMaps;
+  }
+
+  public Cache getCache() {
+    return cache;
+  }
+
+  public boolean isFlushCacheRequired() {
+    return flushCacheRequired;
+  }
+
+  public boolean isUseCache() {
+    return useCache;
+  }
+
+  public boolean isResultOrdered() {
+    return resultOrdered;
+  }
+
+  public String getDatabaseId() {
+    return databaseId;
+  }
+
+  public String[] getKeyProperties() {
+    return keyProperties;
+  }
+
+  public String[] getKeyColumns() {
+    return keyColumns;
+  }
+
+  public Log getStatementLog() {
+    return statementLog;
+  }
+
+  public LanguageDriver getLang() {
+    return lang;
+  }
+
+  public String[] getResultSets() {
+    return resultSets;
+  }
+
+  /**
+   * Gets the resul sets.
+   *
+   * @return the resul sets
+   * @deprecated Use {@link #getResultSets()}
+   */
+  @Deprecated
+  public String[] getResulSets() {
+    return resultSets;
+  }
+
+  public BoundSql getBoundSql(Object parameterObject) {
+    BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
+    List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+    if (parameterMappings == null || parameterMappings.isEmpty()) {
+      boundSql = new BoundSql(configuration, boundSql.getSql(), parameterMap.getParameterMappings(), parameterObject);
+    }
+
+    // check for nested result maps in parameter mappings (issue #30)
+    for (ParameterMapping pm : boundSql.getParameterMappings()) {
+      String rmId = pm.getResultMapId();
+      if (rmId != null) {
+        ResultMap rm = configuration.getResultMap(rmId);
+        if (rm != null) {
+          hasNestedResultMaps |= rm.hasNestedResultMaps();
+        }
+      }
+    }
+
+    return boundSql;
+  }
+
   public static class Builder {
-    private MappedStatement mappedStatement = new MappedStatement();
+    private final MappedStatement mappedStatement = new MappedStatement();
 
     public Builder(Configuration configuration, String id, SqlSource sqlSource, SqlCommandType sqlCommandType) {
       mappedStatement.configuration = configuration;
@@ -195,138 +327,6 @@ public final class MappedStatement {
       assert mappedStatement.lang != null;
       mappedStatement.resultMaps = Collections.unmodifiableList(mappedStatement.resultMaps);
       return mappedStatement;
-    }
-  }
-
-  public KeyGenerator getKeyGenerator() {
-    return keyGenerator;
-  }
-
-  public SqlCommandType getSqlCommandType() {
-    return sqlCommandType;
-  }
-
-  public String getResource() {
-    return resource;
-  }
-
-  public Configuration getConfiguration() {
-    return configuration;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public boolean hasNestedResultMaps() {
-    return hasNestedResultMaps;
-  }
-
-  public Integer getFetchSize() {
-    return fetchSize;
-  }
-
-  public Integer getTimeout() {
-    return timeout;
-  }
-
-  public StatementType getStatementType() {
-    return statementType;
-  }
-
-  public ResultSetType getResultSetType() {
-    return resultSetType;
-  }
-
-  public SqlSource getSqlSource() {
-    return sqlSource;
-  }
-
-  public ParameterMap getParameterMap() {
-    return parameterMap;
-  }
-
-  public List<ResultMap> getResultMaps() {
-    return resultMaps;
-  }
-
-  public Cache getCache() {
-    return cache;
-  }
-
-  public boolean isFlushCacheRequired() {
-    return flushCacheRequired;
-  }
-
-  public boolean isUseCache() {
-    return useCache;
-  }
-
-  public boolean isResultOrdered() {
-    return resultOrdered;
-  }
-
-  public String getDatabaseId() {
-    return databaseId;
-  }
-
-  public String[] getKeyProperties() {
-    return keyProperties;
-  }
-
-  public String[] getKeyColumns() {
-    return keyColumns;
-  }
-
-  public Log getStatementLog() {
-    return statementLog;
-  }
-
-  public LanguageDriver getLang() {
-    return lang;
-  }
-
-  public String[] getResultSets() {
-    return resultSets;
-  }
-
-  /**
-   * Gets the resul sets.
-   *
-   * @return the resul sets
-   * @deprecated Use {@link #getResultSets()}
-   */
-  @Deprecated
-  public String[] getResulSets() {
-    return resultSets;
-  }
-
-  public BoundSql getBoundSql(Object parameterObject) {
-    BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-    List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-    if (parameterMappings == null || parameterMappings.isEmpty()) {
-      boundSql = new BoundSql(configuration, boundSql.getSql(), parameterMap.getParameterMappings(), parameterObject);
-    }
-
-    // check for nested result maps in parameter mappings (issue #30)
-    for (ParameterMapping pm : boundSql.getParameterMappings()) {
-      String rmId = pm.getResultMapId();
-      if (rmId != null) {
-        ResultMap rm = configuration.getResultMap(rmId);
-        if (rm != null) {
-          hasNestedResultMaps |= rm.hasNestedResultMaps();
-        }
-      }
-    }
-
-    return boundSql;
-  }
-
-  private static String[] delimitedStringToArray(String in) {
-    if (in == null || in.trim().length() == 0) {
-      return null;
-    } else {
-      return in.split(",");
     }
   }
 

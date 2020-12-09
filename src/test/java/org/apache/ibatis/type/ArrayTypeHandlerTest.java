@@ -1,19 +1,26 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.type;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+
+import java.sql.Array;
+import java.sql.Connection;
+import java.sql.Types;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -23,13 +30,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.sql.Array;
-import java.sql.Connection;
-import java.sql.Types;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
 
@@ -53,7 +53,7 @@ class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
     Array array = mock(Array.class);
     when(connection.createArrayOf(anyString(), any(String[].class))).thenReturn(array);
 
-    TYPE_HANDLER.setParameter(ps, 1, new String[] { "Hello World" }, JdbcType.ARRAY);
+    TYPE_HANDLER.setParameter(ps, 1, new String[]{"Hello World"}, JdbcType.ARRAY);
     verify(ps).setArray(1, array);
     verify(array).free();
   }
@@ -75,7 +75,7 @@ class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
   @Test
   public void shouldGetResultFromResultSetByName() throws Exception {
     when(rs.getArray("column")).thenReturn(mockArray);
-    String[] stringArray = new String[] { "a", "b" };
+    String[] stringArray = new String[]{"a", "b"};
     when(mockArray.getArray()).thenReturn(stringArray);
     assertEquals(stringArray, TYPE_HANDLER.getResult(rs, "column"));
     verify(mockArray).free();
@@ -92,7 +92,7 @@ class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
   @Test
   public void shouldGetResultFromResultSetByPosition() throws Exception {
     when(rs.getArray(1)).thenReturn(mockArray);
-    String[] stringArray = new String[] { "a", "b" };
+    String[] stringArray = new String[]{"a", "b"};
     when(mockArray.getArray()).thenReturn(stringArray);
     assertEquals(stringArray, TYPE_HANDLER.getResult(rs, 1));
     verify(mockArray).free();
@@ -109,7 +109,7 @@ class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
   @Test
   public void shouldGetResultFromCallableStatement() throws Exception {
     when(cs.getArray(1)).thenReturn(mockArray);
-    String[] stringArray = new String[] { "a", "b" };
+    String[] stringArray = new String[]{"a", "b"};
     when(mockArray.getArray()).thenReturn(stringArray);
     assertEquals(stringArray, TYPE_HANDLER.getResult(cs, 1));
     verify(mockArray).free();

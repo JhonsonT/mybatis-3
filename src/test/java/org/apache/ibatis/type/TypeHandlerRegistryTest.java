@@ -1,21 +1,23 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.type;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.apache.ibatis.domain.misc.RichType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.sql.CallableStatement;
@@ -30,9 +32,11 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.apache.ibatis.domain.misc.RichType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TypeHandlerRegistryTest {
 
@@ -85,7 +89,8 @@ class TypeHandlerRegistryTest {
 
     };
 
-    TypeReference<List<URI>> type = new TypeReference<List<URI>>(){};
+    TypeReference<List<URI>> type = new TypeReference<List<URI>>() {
+    };
 
     typeHandlerRegistry.register(type, fakeHandler);
     assertSame(fakeHandler, typeHandlerRegistry.getTypeHandler(type));
@@ -122,7 +127,8 @@ class TypeHandlerRegistryTest {
 
     typeHandlerRegistry.register(fakeHandler);
 
-    assertSame(fakeHandler, typeHandlerRegistry.getTypeHandler(new TypeReference<List<URI>>(){}));
+    assertSame(fakeHandler, typeHandlerRegistry.getTypeHandler(new TypeReference<List<URI>>() {
+    }));
   }
 
   @Test
@@ -154,13 +160,46 @@ class TypeHandlerRegistryTest {
     assertEquals(DateTypeHandler.class, typeHandlerRegistry.getTypeHandler(MyDate2.class).getClass());
   }
 
-  interface SomeInterface {
+  @Test
+  void demoTypeHandlerForSuperInterface() {
+    typeHandlerRegistry.register(SomeInterfaceTypeHandler.class);
+    assertNull(typeHandlerRegistry.getTypeHandler(SomeClass.class), "Registering interface works only for enums.");
+    assertSame(EnumTypeHandler.class, typeHandlerRegistry.getTypeHandler(NoTypeHandlerInterfaceEnum.class).getClass(),
+      "When type handler for interface is not exist, apply default enum type handler.");
+    assertSame(SomeInterfaceTypeHandler.class, typeHandlerRegistry.getTypeHandler(SomeEnum.class).getClass());
+    assertSame(SomeInterfaceTypeHandler.class, typeHandlerRegistry.getTypeHandler(ExtendingSomeEnum.class).getClass());
+    assertSame(SomeInterfaceTypeHandler.class,
+      typeHandlerRegistry.getTypeHandler(ImplementingMultiInterfaceSomeEnum.class).getClass());
   }
 
-  interface ExtendingSomeInterface extends SomeInterface {
+  @Test
+  void shouldRegisterReplaceNullMap() {
+    class Address {
+    }
+    assertFalse(typeHandlerRegistry.hasTypeHandler(Address.class));
+    typeHandlerRegistry.register(Address.class, StringTypeHandler.class);
+    assertTrue(typeHandlerRegistry.hasTypeHandler(Address.class));
   }
 
-  interface NoTypeHandlerInterface {
+  @Test
+  void shouldAutoRegisterEnutmTypeInMultiThreadEnvironment() throws Exception {
+    // gh-1820
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    try {
+      for (int iteration = 0; iteration < 2000; iteration++) {
+        TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
+        List<Future<Boolean>> taskResults = IntStream.range(0, 2)
+          .mapToObj(taskIndex -> executorService.submit(() -> {
+            return typeHandlerRegistry.hasTypeHandler(TestEnum.class, JdbcType.VARCHAR);
+          })).collect(Collectors.toList());
+        for (int i = 0; i < taskResults.size(); i++) {
+          Future<Boolean> future = taskResults.get(i);
+          assertTrue(future.get(), "false is returned at round " + iteration);
+        }
+      }
+    } finally {
+      executorService.shutdownNow();
+    }
   }
 
   enum SomeEnum implements SomeInterface {
@@ -175,7 +214,18 @@ class TypeHandlerRegistryTest {
   enum NoTypeHandlerInterfaceEnum implements NoTypeHandlerInterface {
   }
 
-  class SomeClass implements SomeInterface {
+  enum TestEnum {
+    ONE,
+    TWO
+  }
+
+  interface SomeInterface {
+  }
+
+  interface ExtendingSomeInterface extends SomeInterface {
+  }
+
+  interface NoTypeHandlerInterface {
   }
 
   @MappedTypes(SomeInterface.class)
@@ -200,50 +250,6 @@ class TypeHandlerRegistryTest {
     }
   }
 
-  @Test
-  void demoTypeHandlerForSuperInterface() {
-    typeHandlerRegistry.register(SomeInterfaceTypeHandler.class);
-    assertNull(typeHandlerRegistry.getTypeHandler(SomeClass.class), "Registering interface works only for enums.");
-    assertSame(EnumTypeHandler.class, typeHandlerRegistry.getTypeHandler(NoTypeHandlerInterfaceEnum.class).getClass(),
-        "When type handler for interface is not exist, apply default enum type handler.");
-    assertSame(SomeInterfaceTypeHandler.class, typeHandlerRegistry.getTypeHandler(SomeEnum.class).getClass());
-    assertSame(SomeInterfaceTypeHandler.class, typeHandlerRegistry.getTypeHandler(ExtendingSomeEnum.class).getClass());
-    assertSame(SomeInterfaceTypeHandler.class,
-        typeHandlerRegistry.getTypeHandler(ImplementingMultiInterfaceSomeEnum.class).getClass());
-  }
-
-  @Test
-  void shouldRegisterReplaceNullMap() {
-    class Address {
-    }
-    assertFalse(typeHandlerRegistry.hasTypeHandler(Address.class));
-    typeHandlerRegistry.register(Address.class, StringTypeHandler.class);
-    assertTrue(typeHandlerRegistry.hasTypeHandler(Address.class));
-  }
-
-  enum TestEnum {
-    ONE,
-    TWO
-  }
-
-  @Test
-  void shouldAutoRegisterEnutmTypeInMultiThreadEnvironment() throws Exception {
-    // gh-1820
-    ExecutorService executorService = Executors.newCachedThreadPool();
-    try {
-      for (int iteration = 0; iteration < 2000; iteration++) {
-        TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
-        List<Future<Boolean>> taskResults = IntStream.range(0, 2)
-            .mapToObj(taskIndex -> executorService.submit(() -> {
-              return typeHandlerRegistry.hasTypeHandler(TestEnum.class, JdbcType.VARCHAR);
-            })).collect(Collectors.toList());
-        for (int i = 0; i < taskResults.size(); i++) {
-          Future<Boolean> future = taskResults.get(i);
-          assertTrue(future.get(), "false is returned at round " + iteration);
-        }
-      }
-    } finally {
-      executorService.shutdownNow();
-    }
+  class SomeClass implements SomeInterface {
   }
 }

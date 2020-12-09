@@ -1,24 +1,19 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.mapping;
-
-import static com.googlecode.catchexception.apis.BDDCatchException.*;
-import static org.assertj.core.api.BDDAssertions.then;
-
-import java.lang.reflect.Field;
 
 import org.apache.ibatis.builder.InitializingObject;
 import org.apache.ibatis.cache.Cache;
@@ -26,6 +21,12 @@ import org.apache.ibatis.cache.CacheException;
 import org.apache.ibatis.cache.impl.PerpetualCache;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Field;
+
+import static com.googlecode.catchexception.apis.BDDCatchException.caughtException;
+import static com.googlecode.catchexception.apis.BDDCatchException.when;
+import static org.assertj.core.api.BDDAssertions.then;
 
 class CacheBuilderTest {
 

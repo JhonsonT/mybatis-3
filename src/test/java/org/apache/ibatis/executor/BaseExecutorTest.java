@@ -1,33 +1,21 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.executor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javassist.util.proxy.Proxy;
-
-import javax.sql.DataSource;
-
 import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.domain.blog.Author;
 import org.apache.ibatis.domain.blog.Blog;
@@ -41,14 +29,19 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransaction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class BaseExecutorTest extends BaseDataTest {
-  protected final Configuration config;
-  private static DataSource ds;
+import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-  @BeforeAll
-  static void setup() throws Exception {
-    ds = createBlogDataSource();
-  }
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class BaseExecutorTest extends BaseDataTest {
+  private static DataSource ds;
+  protected final Configuration config;
 
   BaseExecutorTest() {
     config = new Configuration();
@@ -58,6 +51,11 @@ class BaseExecutorTest extends BaseDataTest {
     config.setUseColumnLabel(true);
     config.setDefaultStatementTimeout(5000);
     config.setDefaultFetchSize(100);
+  }
+
+  @BeforeAll
+  static void setup() throws Exception {
+    ds = createBlogDataSource();
   }
 
   @Test
@@ -245,9 +243,9 @@ class BaseExecutorTest extends BaseDataTest {
     Executor executor = createExecutor(new JdbcTransaction(ds, null, false));
     try {
       MappedStatement selectStatement = ExecutorTestHelper.prepareSelectDiscriminatedPost(config);
-      List<Map<String,String>> products = executor.query(selectStatement, null, RowBounds.DEFAULT, Executor.NO_RESULT_HANDLER);
+      List<Map<String, String>> products = executor.query(selectStatement, null, RowBounds.DEFAULT, Executor.NO_RESULT_HANDLER);
       assertEquals(5, products.size());
-      for (Map<String,String> m : products) {
+      for (Map<String, String> m : products) {
         if ("IMAGES".equals(m.get("SECTION"))) {
           assertNull(m.get("subject"));
         } else {
@@ -265,9 +263,9 @@ class BaseExecutorTest extends BaseDataTest {
     Executor executor = createExecutor(new JdbcTransaction(ds, null, false));
     try {
       MappedStatement selectStatement = ExecutorTestHelper.prepareSelectDiscriminatedPost(config);
-      List<Map<String,String>> products = executor.query(selectStatement, null, new RowBounds(2, 2), Executor.NO_RESULT_HANDLER);
+      List<Map<String, String>> products = executor.query(selectStatement, null, new RowBounds(2, 2), Executor.NO_RESULT_HANDLER);
       assertEquals(2, products.size());
-      for (Map<String,String> m : products) {
+      for (Map<String, String> m : products) {
         if ("IMAGES".equals(m.get("SECTION"))) {
           assertNull(m.get("subject"));
         } else {

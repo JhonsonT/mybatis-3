@@ -1,34 +1,19 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2019 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.executor.resultset;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.executor.Executor;
@@ -48,15 +33,30 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class DefaultResultSetHandlerTest2 {
 
+  @Mock
+  protected ResultSetMetaData rsmd;
   @Spy
   private ImpatientResultSet rs;
   @Mock
   private Statement stmt;
-  @Mock
-  protected ResultSetMetaData rsmd;
   @Mock
   private Connection conn;
   @Mock
@@ -69,15 +69,15 @@ class DefaultResultSetHandlerTest2 {
     final TypeHandlerRegistry registry = config.getTypeHandlerRegistry();
     final MappedStatement ms = new MappedStatement.Builder(config, "testSelect",
       new StaticSqlSource(config, "some select statement"), SqlCommandType.SELECT).resultMaps(
-        new ArrayList<ResultMap>() {
-          {
-            add(new ResultMap.Builder(config, "testMap", HashMap.class, new ArrayList<ResultMapping>() {
-              {
-                add(new ResultMapping.Builder(config, "id", "id", registry.getTypeHandler(Integer.class)).build());
-              }
-            }).build());
-          }
-        }).build();
+      new ArrayList<ResultMap>() {
+        {
+          add(new ResultMap.Builder(config, "testMap", HashMap.class, new ArrayList<ResultMapping>() {
+            {
+              add(new ResultMapping.Builder(config, "id", "id", registry.getTypeHandler(Integer.class)).build());
+            }
+          }).build());
+        }
+      }).build();
 
     final Executor executor = null;
     final ParameterHandler parameterHandler = null;
@@ -116,19 +116,19 @@ class DefaultResultSetHandlerTest2 {
     final MappedStatement ms = new MappedStatement.Builder(config, "selectPerson",
       new StaticSqlSource(config, "select person..."),
       SqlCommandType.SELECT).resultMaps(
-        new ArrayList<ResultMap>() {
-          {
-            add(new ResultMap.Builder(config, "personMap", HashMap.class, new ArrayList<ResultMapping>() {
-              {
-                add(new ResultMapping.Builder(config, "id", "id", registry.getTypeHandler(Integer.class))
-                  .build());
-                add(new ResultMapping.Builder(config, "roles").nestedResultMapId("roleMap").build());
-              }
-            }).build());
-          }
-        })
-        .resultOrdered(true)
-        .build();
+      new ArrayList<ResultMap>() {
+        {
+          add(new ResultMap.Builder(config, "personMap", HashMap.class, new ArrayList<ResultMapping>() {
+            {
+              add(new ResultMapping.Builder(config, "id", "id", registry.getTypeHandler(Integer.class))
+                .build());
+              add(new ResultMapping.Builder(config, "roles").nestedResultMapId("roleMap").build());
+            }
+          }).build());
+        }
+      })
+      .resultOrdered(true)
+      .build();
 
     final Executor executor = null;
     final ParameterHandler parameterHandler = null;
@@ -153,7 +153,7 @@ class DefaultResultSetHandlerTest2 {
    */
   protected abstract class ImpatientResultSet implements ResultSet {
     private int rowIndex = -1;
-    private List<Map<String, Object>> rows = new ArrayList<>();
+    private final List<Map<String, Object>> rows = new ArrayList<>();
 
     protected ImpatientResultSet() {
       Map<String, Object> row = new HashMap<>();

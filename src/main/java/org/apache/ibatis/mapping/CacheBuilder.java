@@ -1,25 +1,19 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2019 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.mapping;
-
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import org.apache.ibatis.builder.InitializingObject;
 import org.apache.ibatis.cache.Cache;
@@ -34,13 +28,19 @@ import org.apache.ibatis.cache.impl.PerpetualCache;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 /**
  * @author Clinton Begin
  */
 public class CacheBuilder {
   private final String id;
-  private Class<? extends Cache> implementation;
   private final List<Class<? extends Cache>> decorators;
+  private Class<? extends Cache> implementation;
   private Integer size;
   private Long clearInterval;
   private boolean readWrite;
@@ -150,25 +150,25 @@ public class CacheBuilder {
           if (String.class == type) {
             metaCache.setValue(name, value);
           } else if (int.class == type
-              || Integer.class == type) {
+            || Integer.class == type) {
             metaCache.setValue(name, Integer.valueOf(value));
           } else if (long.class == type
-              || Long.class == type) {
+            || Long.class == type) {
             metaCache.setValue(name, Long.valueOf(value));
           } else if (short.class == type
-              || Short.class == type) {
+            || Short.class == type) {
             metaCache.setValue(name, Short.valueOf(value));
           } else if (byte.class == type
-              || Byte.class == type) {
+            || Byte.class == type) {
             metaCache.setValue(name, Byte.valueOf(value));
           } else if (float.class == type
-              || Float.class == type) {
+            || Float.class == type) {
             metaCache.setValue(name, Float.valueOf(value));
           } else if (boolean.class == type
-              || Boolean.class == type) {
+            || Boolean.class == type) {
             metaCache.setValue(name, Boolean.valueOf(value));
           } else if (double.class == type
-              || Double.class == type) {
+            || Double.class == type) {
             metaCache.setValue(name, Double.valueOf(value));
           } else {
             throw new CacheException("Unsupported property type for cache: '" + name + "' of type " + type);

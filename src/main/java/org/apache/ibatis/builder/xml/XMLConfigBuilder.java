@@ -1,25 +1,19 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.builder.xml;
-
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.Properties;
-
-import javax.sql.DataSource;
 
 import org.apache.ibatis.builder.BaseBuilder;
 import org.apache.ibatis.builder.BuilderException;
@@ -47,16 +41,21 @@ import org.apache.ibatis.session.LocalCacheScope;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 
+import javax.sql.DataSource;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.Properties;
+
 /**
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
 public class XMLConfigBuilder extends BaseBuilder {
 
-  private boolean parsed;
   private final XPathParser parser;
-  private String environment;
   private final ReflectorFactory localReflectorFactory = new DefaultReflectorFactory();
+  private boolean parsed;
+  private String environment;
 
   public XMLConfigBuilder(Reader reader) {
     this(reader, null, null);
@@ -145,7 +144,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       for (String clazz : clazzes) {
         if (!clazz.isEmpty()) {
           @SuppressWarnings("unchecked")
-          Class<? extends VFS> vfsImpl = (Class<? extends VFS>)Resources.classForName(clazz);
+          Class<? extends VFS> vfsImpl = (Class<? extends VFS>) Resources.classForName(clazz);
           configuration.setVfsImpl(vfsImpl);
         }
       }
@@ -284,8 +283,8 @@ public class XMLConfigBuilder extends BaseBuilder {
           DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
           DataSource dataSource = dsFactory.getDataSource();
           Environment.Builder environmentBuilder = new Environment.Builder(id)
-              .transactionFactory(txFactory)
-              .dataSource(dataSource);
+            .transactionFactory(txFactory)
+            .dataSource(dataSource);
           configuration.setEnvironment(environmentBuilder.build());
         }
       }
@@ -396,10 +395,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       throw new BuilderException("No environment specified.");
     } else if (id == null) {
       throw new BuilderException("Environment requires an id attribute.");
-    } else if (environment.equals(id)) {
-      return true;
-    }
-    return false;
+    } else return environment.equals(id);
   }
 
 }

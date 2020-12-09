@@ -1,23 +1,27 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.executor.loader;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.apache.ibatis.domain.blog.Author;
+import org.apache.ibatis.domain.blog.Section;
+import org.apache.ibatis.executor.ExecutorException;
+import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
+import org.apache.ibatis.session.Configuration;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,26 +32,21 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import org.apache.ibatis.domain.blog.Author;
-import org.apache.ibatis.domain.blog.Section;
-import org.apache.ibatis.executor.ExecutorException;
-import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
-import org.apache.ibatis.session.Configuration;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public abstract class SerializableProxyTest {
 
-  protected Author author = new Author(999, "someone", "!@#@!#!@#", "someone@somewhere.com", "blah", Section.NEWS);
-
   static ProxyFactory proxyFactory;
+  protected Author author = new Author(999, "someone", "!@#@!#!@#", "someone@somewhere.com", "blah", Section.NEWS);
 
   @Test
   void shouldKeepGenericTypes() {
     for (int i = 0; i < 10000; i++) {
       Author pc = new Author();
       Author proxy = (Author) proxyFactory.createProxy(pc, new ResultLoaderMap(), new Configuration(), new DefaultObjectFactory(),
-          new ArrayList<>(), new ArrayList<>());
+        new ArrayList<>(), new ArrayList<>());
       proxy.getBio();
     }
   }
@@ -178,8 +177,8 @@ public abstract class SerializableProxyTest {
   }
 
   byte[] serialize(Serializable value) throws Exception {
-    try(ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+         ObjectOutputStream oos = new ObjectOutputStream(bos)) {
       oos.writeObject(value);
       oos.flush();
       return bos.toByteArray();
@@ -187,8 +186,8 @@ public abstract class SerializableProxyTest {
   }
 
   Serializable deserialize(byte[] value) throws Exception {
-    try(ByteArrayInputStream bis = new ByteArrayInputStream(value);
-    ObjectInputStream ois = new ObjectInputStream(bis)) {
+    try (ByteArrayInputStream bis = new ByteArrayInputStream(value);
+         ObjectInputStream ois = new ObjectInputStream(bis)) {
       return (Serializable) ois.readObject();
     }
   }
@@ -199,7 +198,7 @@ public abstract class SerializableProxyTest {
     }
 
     AuthorWithWriteReplaceMethod(Integer id, String username, String password, String email, String bio, Section section) {
-        super(id, username, password, email, bio, section);
+      super(id, username, password, email, bio, section);
     }
 
     Object writeReplace() throws ObjectStreamException {
@@ -210,7 +209,7 @@ public abstract class SerializableProxyTest {
   public static class AuthorWithoutDefaultConstructor extends Author {
 
     AuthorWithoutDefaultConstructor(Integer id, String username, String password, String email, String bio, Section section) {
-        super(id, username, password, email, bio, section);
+      super(id, username, password, email, bio, section);
     }
 
     protected Object writeReplace() throws ObjectStreamException {
