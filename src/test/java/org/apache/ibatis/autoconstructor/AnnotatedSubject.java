@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009-2017 the original author or authors.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,7 @@ public class AnnotatedSubject {
     this.weight = weight;
   }
 
+  //自动映射构造器
   @AutomapConstructor
   public AnnotatedSubject(final int id, final String name, final int age, final Integer height, final Integer weight) {
     this.id = id;
