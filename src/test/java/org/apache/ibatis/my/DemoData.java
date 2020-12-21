@@ -17,9 +17,11 @@ package org.apache.ibatis.my;
 
 import java.io.Serializable;
 
-public class Demo implements Serializable {
+public class DemoData implements Serializable {
   private Integer id;
-  private String name;
+  private Integer demoId;
+  private String desc;
+  private Demo demo;
 
   public Integer getId() {
     return id;
@@ -29,19 +31,37 @@ public class Demo implements Serializable {
     this.id = id;
   }
 
-  public String getName() {
-    return name;
+  public Integer getDemoId() {
+    return demoId;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setDemoId(Integer demoId) {
+    this.demoId = demoId;
+  }
+
+  public String getDesc() {
+    return desc;
+  }
+
+  public void setDesc(String desc) {
+    this.desc = desc;
+  }
+
+  public Demo getDemo() {
+    return demo;
+  }
+
+  public void setDemo(Demo demo) {
+    this.demo = demo;
   }
 
   @Override
   public String toString() {
-    return "Demo{" +
+    return "DemoData{" +
       "id=" + id +
-      ", name='" + name + '\'' +
+      ", demoId=" + demoId +
+      ", desc='" + desc + '\'' +
+      ", demo=" + demo +
       '}';
   }
 }

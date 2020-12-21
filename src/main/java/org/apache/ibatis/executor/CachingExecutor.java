@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.executor;
 
@@ -33,12 +33,21 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
+ * 实现二级缓存功能
+ *
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
 public class CachingExecutor implements Executor {
 
+  /**
+   * 被委托的 Executor 对象
+   */
   private final Executor delegate;
+  /**
+   * 支持事务的缓存管理器，二级缓存是支持跨 Session 进行共享，此处需要考虑事务
+   * 提交事务后，将当前事务中查询时产生的缓存，同步到二级缓存中
+   */
   private final TransactionalCacheManager tcm = new TransactionalCacheManager();
 
   public CachingExecutor(Executor delegate) {
@@ -94,13 +103,16 @@ public class CachingExecutor implements Executor {
     throws SQLException {
     Cache cache = ms.getCache();
     if (cache != null) {
+      //如果需要清空缓存就清空，仅仅清空事务中产生的查询缓存
       flushCacheIfRequired(ms);
       if (ms.isUseCache() && resultHandler == null) {
+        //存储过程相关
         ensureNoOutParams(ms, boundSql);
         @SuppressWarnings("unchecked")
         List<E> list = (List<E>) tcm.getObject(cache, key);
         if (list == null) {
           list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+          //缓存结果到事务缓存管理器
           tcm.putObject(cache, key, list); // issue #578 and #116
         }
         return list;

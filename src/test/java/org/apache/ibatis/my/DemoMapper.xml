@@ -22,4 +22,30 @@
 
 <mapper namespace="org.apache.ibatis.my.DemoMapper">
   <cache/>
+  <select id="getDemo"
+          flushCache="false"
+          resultType="org.apache.ibatis.my.Demo">
+    SELECT *
+    FROM demo
+    WHERE id = #{id}
+  </select>
+
+  <resultMap id="newDemoDataResultMap" type="org.apache.ibatis.my.DemoData">
+    <id column="id" property="id"/>
+    <result column="demo_id" property="demoId"/>
+    <result column="desc" property="desc"/>
+
+    <association property="demo" javaType="org.apache.ibatis.my.Demo"
+                 select="getDemo" column="demo_id"/>
+  </resultMap>
+
+  <select id="queryDemoDataList" resultMap="newDemoDataResultMap">
+    select *
+    from demo_data
+    <where>
+      <if test="id !=null">
+        id=#{id}
+      </if>
+    </where>
+  </select>
 </mapper>

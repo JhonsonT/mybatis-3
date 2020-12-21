@@ -25,8 +25,20 @@
   <!-- autoMappingBehavior should be set in each test case -->
 
   <settings>
+    <!--开启Mybatis的sql执行相关信息打印-->
+    <setting name="logImpl" value="STDOUT_LOGGING"/>
+
     <!-- 二级缓存开关 -->
     <setting name="cacheEnabled" value="true"/>
+    <!-- 执行器类型 -->
+    <setting name="defaultExecutorType" value="SIMPLE"/>
+
+    <!-- 延迟加载的代理类型 -->
+    <setting name="proxyFactory" value="JAVASSIST"/>
+    <!-- 打开延迟加载的开关 -->
+    <setting name="lazyLoadingEnabled" value="true"/>
+    <!-- 将积极加载改为消极加载(及按需加载) -->
+    <setting name="aggressiveLazyLoading" value="false"/>
   </settings>
 
   <environments default="development">

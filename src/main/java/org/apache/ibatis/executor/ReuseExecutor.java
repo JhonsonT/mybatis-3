@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.executor;
 
@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 可重用
+ *
  * @author Clinton Begin
  */
 public class ReuseExecutor extends BaseExecutor {
@@ -57,6 +59,7 @@ public class ReuseExecutor extends BaseExecutor {
     Configuration configuration = ms.getConfiguration();
     StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
     Statement stmt = prepareStatement(handler, ms.getStatementLog());
+    //执行完之后不用关闭Statement对象
     return handler.query(stmt, resultHandler);
   }
 
@@ -81,14 +84,22 @@ public class ReuseExecutor extends BaseExecutor {
     Statement stmt;
     BoundSql boundSql = handler.getBoundSql();
     String sql = boundSql.getSql();
+
     if (hasStatementFor(sql)) {
+      //存在
+      //从hashMap缓存中获得 Statement对象
       stmt = getStatement(sql);
+      //设置事务超时时间
       applyTransactionTimeout(stmt);
     } else {
+      //不存在
       Connection connection = getConnection(statementLog);
+      //创建Statement对象
       stmt = handler.prepare(connection, transaction.getTimeout());
+      //添加到hashMap缓存中
       putStatement(sql, stmt);
     }
+    //设置 SQL 上的参数
     handler.parameterize(stmt);
     return stmt;
   }
@@ -96,6 +107,7 @@ public class ReuseExecutor extends BaseExecutor {
   private boolean hasStatementFor(String sql) {
     try {
       Statement statement = statementMap.get(sql);
+      //要求存在 并且 连接未关闭
       return statement != null && !statement.getConnection().isClosed();
     } catch (SQLException e) {
       return false;

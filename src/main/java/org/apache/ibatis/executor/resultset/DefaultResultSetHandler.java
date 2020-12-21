@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.executor.resultset;
 
@@ -598,15 +598,21 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   }
 
   private Object createResultObject(ResultSetWrapper rsw, ResultMap resultMap, ResultLoaderMap lazyLoader, String columnPrefix) throws SQLException {
+    //useConstructorMappings，表示是否使用构造方法创建该结果对象。此处将其重置
     this.useConstructorMappings = false; // reset previous mapping result
+    //记录使用的构造方法的参数类型的数组
     final List<Class<?>> constructorArgTypes = new ArrayList<>();
+    //记录使用的构造方法的参数值的数组
     final List<Object> constructorArgs = new ArrayList<>();
+    //创建映射后的结果对象
     Object resultObject = createResultObject(rsw, resultMap, constructorArgTypes, constructorArgs, columnPrefix);
     if (resultObject != null && !hasTypeHandlerForResultObject(rsw, resultMap.getType())) {
+      //如果有内嵌的查询，并且开启延迟加载，则创建结果对象的代理对象
       final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();
       for (ResultMapping propertyMapping : propertyMappings) {
         // issue gcode #109 && issue #149
         if (propertyMapping.getNestedQueryId() != null && propertyMapping.isLazy()) {
+          //创建结果对象的代理对象
           resultObject = configuration.getProxyFactory().createProxy(resultObject, lazyLoader, configuration, objectFactory, constructorArgTypes, constructorArgs);
           break;
         }
@@ -733,43 +739,73 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return typeHandler.getResult(rsw.getResultSet(), columnName);
   }
 
+  /**
+   * 获得嵌套查询的值
+   */
   private Object getNestedQueryConstructorValue(ResultSet rs, ResultMapping constructorMapping, String columnPrefix) throws SQLException {
+    //获得内嵌查询的编号
     final String nestedQueryId = constructorMapping.getNestedQueryId();
+    //获得内嵌查询的 MappedStatement 对象
     final MappedStatement nestedQuery = configuration.getMappedStatement(nestedQueryId);
+    //获得内嵌查询的参数类型
     final Class<?> nestedQueryParameterType = nestedQuery.getParameterMap().getType();
+    //获得内嵌查询的参数对象
     final Object nestedQueryParameterObject = prepareParameterForNestedQuery(rs, constructorMapping, nestedQueryParameterType, columnPrefix);
     Object value = null;
     if (nestedQueryParameterObject != null) {
+      //获得 BoundSql 对象
       final BoundSql nestedBoundSql = nestedQuery.getBoundSql(nestedQueryParameterObject);
+      //获得 CacheKey 对象
       final CacheKey key = executor.createCacheKey(nestedQuery, nestedQueryParameterObject, RowBounds.DEFAULT, nestedBoundSql);
       final Class<?> targetType = constructorMapping.getJavaType();
+      //创建 ResultLoader 对象，因为是结果对象的构造方法中使用的值，无法使用延迟加载的功能，所以使用 ResultLoader 直接加载。
       final ResultLoader resultLoader = new ResultLoader(configuration, executor, nestedQuery, nestedQueryParameterObject, targetType, key, nestedBoundSql);
+      //加载结果
       value = resultLoader.loadResult();
     }
     return value;
   }
 
+  /**
+   * 获得嵌套查询的值
+   */
   private Object getNestedQueryMappingValue(ResultSet rs, MetaObject metaResultObject, ResultMapping propertyMapping, ResultLoaderMap lazyLoader, String columnPrefix)
     throws SQLException {
+    //获得内嵌查询的编号(就是namespace + 方法)
     final String nestedQueryId = propertyMapping.getNestedQueryId();
+    //获得属性名
     final String property = propertyMapping.getProperty();
+    //获得内嵌查询的 MappedStatement 对象
     final MappedStatement nestedQuery = configuration.getMappedStatement(nestedQueryId);
+    //获得内嵌查询的参数类型
     final Class<?> nestedQueryParameterType = nestedQuery.getParameterMap().getType();
+    //获得内嵌查询的参数对象
     final Object nestedQueryParameterObject = prepareParameterForNestedQuery(rs, propertyMapping, nestedQueryParameterType, columnPrefix);
     Object value = null;
     if (nestedQueryParameterObject != null) {
+      //获得 BoundSql 对象
       final BoundSql nestedBoundSql = nestedQuery.getBoundSql(nestedQueryParameterObject);
+      //获得 CacheKey 对象
       final CacheKey key = executor.createCacheKey(nestedQuery, nestedQueryParameterObject, RowBounds.DEFAULT, nestedBoundSql);
       final Class<?> targetType = propertyMapping.getJavaType();
       if (executor.isCached(nestedQuery, key)) {
+        //检查缓存中已存在
+        // 创建 DeferredLoad 对象，并通过该 DeferredLoad 对象从缓存中加载对象
         executor.deferLoad(nestedQuery, metaResultObject, property, key, targetType);
+        //返回已定义
         value = DEFERRED;
       } else {
+        //检查缓存中不存在
+        //创建 ResultLoader 对象
         final ResultLoader resultLoader = new ResultLoader(configuration, executor, nestedQuery, nestedQueryParameterObject, targetType, key, nestedBoundSql);
         if (propertyMapping.isLazy()) {
+          //如果要求延迟加载，则延迟加载
+          //如果属性配置了延迟加载，将它添加到 `ResultLoader.loaderMap` 中，等待真正使用时再执行嵌套查询并得到结果对象。
           lazyLoader.addLoader(property, metaResultObject, resultLoader);
+          //返回已定义
           value = DEFERRED;
         } else {
+          //如果不要求延迟加载，则直接执行加载对应的值
           value = resultLoader.loadResult();
         }
       }

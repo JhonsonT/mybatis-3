@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.cache.decorators;
 
@@ -39,9 +39,31 @@ public class TransactionalCache implements Cache {
 
   private static final Log log = LogFactory.getLog(TransactionalCache.class);
 
+  /**
+   * 委托的 Cache 对象。
+   * <p>
+   * 实际上，就是二级缓存 Cache 对象。
+   */
   private final Cache delegate;
+
+  /**
+   * 待提交的内容
+   */
   private final Map<Object, Object> entriesToAddOnCommit;
+
+  /**
+   * 查找不到的 KEY 集合
+   * {@link #commit()}
+   * {@link #rollback()}
+   */
   private final Set<Object> entriesMissedInCache;
+
+  /**
+   * 提交时，清空 {@link #delegate}
+   * <p>
+   * 初始时，该值为 false
+   * 清理后{@link #clear()} 时，该值为 true ，表示持续处于清空状态
+   */
   private boolean clearOnCommit;
 
   public TransactionalCache(Cache delegate) {
@@ -96,11 +118,13 @@ public class TransactionalCache implements Cache {
     if (clearOnCommit) {
       delegate.clear();
     }
+    //将 entriesToAddOnCommit、entriesMissedInCache 刷入 delegate 中
     flushPendingEntries();
     reset();
   }
 
   public void rollback() {
+    // 从 delegate 移除出 entriesMissedInCache
     unlockMissedEntries();
     reset();
   }

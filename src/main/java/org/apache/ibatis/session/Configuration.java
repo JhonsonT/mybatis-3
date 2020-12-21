@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.session;
 
@@ -247,8 +247,7 @@ public class Configuration {
   /**
    * Sets an applying type when omit a type on sql provider annotation(e.g. {@link org.apache.ibatis.annotations.SelectProvider}).
    *
-   * @param defaultSqlProviderType
-   *          the default type for sql provider annotation
+   * @param defaultSqlProviderType the default type for sql provider annotation
    * @since 3.5.6
    */
   public void setDefaultSqlProviderType(Class<?> defaultSqlProviderType) {
@@ -364,8 +363,7 @@ public class Configuration {
   /**
    * Sets the auto mapping unknown column behavior.
    *
-   * @param autoMappingUnknownColumnBehavior
-   *          the new auto mapping unknown column behavior
+   * @param autoMappingUnknownColumnBehavior the new auto mapping unknown column behavior
    * @since 3.4.0
    */
   public void setAutoMappingUnknownColumnBehavior(AutoMappingUnknownColumnBehavior autoMappingUnknownColumnBehavior) {
@@ -460,8 +458,7 @@ public class Configuration {
   /**
    * Sets the default fetch size.
    *
-   * @param defaultFetchSize
-   *          the new default fetch size
+   * @param defaultFetchSize the new default fetch size
    * @since 3.3.0
    */
   public void setDefaultFetchSize(Integer defaultFetchSize) {
@@ -481,8 +478,7 @@ public class Configuration {
   /**
    * Sets the default result set type.
    *
-   * @param defaultResultSetType
-   *          the new default result set type
+   * @param defaultResultSetType the new default result set type
    * @since 3.5.2
    */
   public void setDefaultResultSetType(ResultSetType defaultResultSetType) {
@@ -528,6 +524,7 @@ public class Configuration {
   /**
    * Set a default {@link TypeHandler} class for {@link Enum}.
    * A default {@link TypeHandler} is {@link org.apache.ibatis.type.EnumTypeHandler}.
+   *
    * @param typeHandler a type handler class for {@link Enum}
    * @since 3.4.5
    */
@@ -603,8 +600,7 @@ public class Configuration {
   /**
    * Gets the language driver.
    *
-   * @param langClass
-   *          the lang class
+   * @param langClass the lang class
    * @return the language driver
    * @since 3.5.1
    */
@@ -654,6 +650,13 @@ public class Configuration {
     return newExecutor(transaction, defaultExecutorType);
   }
 
+  /**
+   * 创建执行器对象
+   *
+   * @param transaction  事务
+   * @param executorType 执行器类型
+   * @return 执行器对象
+   */
   public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
     executorType = executorType == null ? defaultExecutorType : executorType;
     executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
@@ -666,8 +669,10 @@ public class Configuration {
       executor = new SimpleExecutor(this, transaction);
     }
     if (cacheEnabled) {
+      //如果开启缓存，创建 CachingExecutor 对象，进行包装
       executor = new CachingExecutor(executor);
     }
+    //使用插件
     executor = (Executor) interceptorChain.pluginAll(executor);
     return executor;
   }
@@ -914,8 +919,7 @@ public class Configuration {
   /**
    * Extracts namespace from fully qualified statement id.
    *
-   * @param statementId
-   *          the statement id
+   * @param statementId the statement id
    * @return namespace or null when id does not contain period.
    */
   protected String extractNamespace(String statementId) {
@@ -987,6 +991,7 @@ public class Configuration {
      * Assign a function for producing a conflict error message when contains value with the same key.
      * <p>
      * function arguments are 1st is saved value and 2nd is target value.
+     *
      * @param conflictMessageProducer A function for producing a conflict error message
      * @return a conflict error message
      * @since 3.5.0

@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.executor.loader;
 
@@ -41,15 +41,39 @@ public class ResultLoader {
   protected final Configuration configuration;
   protected final Executor executor;
   protected final MappedStatement mappedStatement;
+
+  /**
+   * 查询的参数对象
+   */
   protected final Object parameterObject;
+
+  /**
+   * 结果的类型
+   */
   protected final Class<?> targetType;
+
   protected final ObjectFactory objectFactory;
   protected final CacheKey cacheKey;
   protected final BoundSql boundSql;
+
+  /**
+   * 结果提取器
+   */
   protected final ResultExtractor resultExtractor;
+
+  /**
+   * 创建 ResultLoader 对象时，所在的线程id
+   */
   protected final long creatorThreadId;
 
+  /**
+   * 是否已经加载了
+   */
   protected boolean loaded;
+
+  /**
+   * 查询的结果对象
+   */
   protected Object resultObject;
 
   public ResultLoader(Configuration config, Executor executor, MappedStatement mappedStatement, Object parameterObject, Class<?> targetType, CacheKey cacheKey, BoundSql boundSql) {
@@ -62,21 +86,27 @@ public class ResultLoader {
     this.cacheKey = cacheKey;
     this.boundSql = boundSql;
     this.resultExtractor = new ResultExtractor(configuration, objectFactory);
+    // 初始化 creatorThreadId
     this.creatorThreadId = Thread.currentThread().getId();
   }
 
   public Object loadResult() throws SQLException {
+    //查询结果
     List<Object> list = selectList();
+    //提取结果
     resultObject = resultExtractor.extractObjectFromList(list, targetType);
     return resultObject;
   }
 
   private <E> List<E> selectList() throws SQLException {
+    //获取执行器对象
     Executor localExecutor = executor;
+    //非线程安全，判断当前线程是否为创建线程，否则重新创建一个执行器对象
     if (Thread.currentThread().getId() != this.creatorThreadId || localExecutor.isClosed()) {
       localExecutor = newExecutor();
     }
     try {
+      //执行查询
       return localExecutor.query(mappedStatement, parameterObject, RowBounds.DEFAULT, Executor.NO_RESULT_HANDLER, cacheKey, boundSql);
     } finally {
       if (localExecutor != executor) {
@@ -86,16 +116,21 @@ public class ResultLoader {
   }
 
   private Executor newExecutor() {
+    //校验 environment
     final Environment environment = configuration.getEnvironment();
     if (environment == null) {
       throw new ExecutorException("ResultLoader could not load lazily.  Environment was not configured.");
     }
+
+    //校验数据源
     final DataSource ds = environment.getDataSource();
     if (ds == null) {
       throw new ExecutorException("ResultLoader could not load lazily.  DataSource was not configured.");
     }
     final TransactionFactory transactionFactory = environment.getTransactionFactory();
+    //创建事务对象
     final Transaction tx = transactionFactory.newTransaction(ds, null, false);
+    //创建执行器对象
     return configuration.newExecutor(tx, ExecutorType.SIMPLE);
   }
 

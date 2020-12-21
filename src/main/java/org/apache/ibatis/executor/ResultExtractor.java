@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.executor;
 
@@ -37,14 +37,19 @@ public class ResultExtractor {
   public Object extractObjectFromList(List<Object> list, Class<?> targetType) {
     Object value = null;
     if (targetType != null && targetType.isAssignableFrom(list.getClass())) {
+      //如果targetType就是list类型，直接返回
       value = list;
     } else if (targetType != null && objectFactory.isCollection(targetType)) {
+      //如果targetType是集合类型，数据全部加进去
       value = objectFactory.create(targetType);
       MetaObject metaObject = configuration.newMetaObject(value);
       metaObject.addAll(list);
     } else if (targetType != null && targetType.isArray()) {
+      //targetType 是数组
+      //创建 array 数组
       Class<?> arrayComponentType = targetType.getComponentType();
       Object array = Array.newInstance(arrayComponentType, list.size());
+      //赋值到array中
       if (arrayComponentType.isPrimitive()) {
         for (int i = 0; i < list.size(); i++) {
           Array.set(array, i, list.get(i));
@@ -54,6 +59,7 @@ public class ResultExtractor {
         value = list.toArray((Object[]) array);
       }
     } else {
+      //普通对象，取第一个对象
       if (list != null && list.size() > 1) {
         throw new ExecutorException("Statement returned more than one row, where no more than one was expected.");
       } else if (list != null && list.size() == 1) {

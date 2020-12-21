@@ -17,11 +17,11 @@ package org.apache.ibatis.my;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.List;
+
 public interface DemoMapper {
-  @Select("SELECT * FROM demo WHERE id = #{id}")
   Demo getDemo(@Param(value = "id") int id);
 
   @Insert("INSERT INTO demo (name) VALUES(#{name})")
@@ -29,4 +29,6 @@ public interface DemoMapper {
 
   @Update("UPDATE demo SET name=#{name} WHERE id=#{id}")
   int modifyDemo(@Param(value = "id") int id, @Param(value = "name") String name);
+
+  List<DemoData> queryDemoDataList(@Param(value = "id") int id);
 }

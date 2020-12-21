@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 public class DemoTest {
   private final static SqlSessionFactory sqlSessionFactory;
@@ -74,7 +75,7 @@ public class DemoTest {
       System.out.println(demo);
 
       DemoMapper mapper2 = sqlSession.getMapper(DemoMapper.class);
-      Demo demo2 = mapper.getDemo(1);
+      Demo demo2 = mapper2.getDemo(1);
       System.out.println(demo2);
 
     }
@@ -88,17 +89,39 @@ public class DemoTest {
       Demo demo = mapper.getDemo(1);
       System.out.println(demo);
 
-//      Long i = mapper.createDemo("ROSE" + System.currentTimeMillis());
+//      Long i = mapper.createDemo("张三" + System.currentTimeMillis());
 //      System.out.println(i);
 
-//      int m = mapper.modifyDemo(1, "ROSE" + System.currentTimeMillis());
+//      int m = mapper.modifyDemo(1, "张三" + System.currentTimeMillis());
 //      System.out.println(m);
 
-      sqlSession.clearCache();
+//      sqlSession.clearCache();
 
       DemoMapper mapper2 = sqlSession.getMapper(DemoMapper.class);
       Demo demo2 = mapper2.getDemo(1);
       System.out.println(demo2);
+    }
+  }
+
+  @Test
+  public void getDemoDataTest() {
+    //通过SqlSessionFactory获取SqlSession实例
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      DemoMapper mapper = sqlSession.getMapper(DemoMapper.class);
+      List<DemoData> demoDataList = mapper.queryDemoDataList(1);
+      demoDataList.forEach(n -> System.out.println("***" + n.getDesc())
+      );
+    }
+  }
+
+  @Test
+  public void getDemoDataTest2() {
+    //通过SqlSessionFactory获取SqlSession实例
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      DemoMapper mapper = sqlSession.getMapper(DemoMapper.class);
+      List<DemoData> demoDataList = mapper.queryDemoDataList(1);
+      demoDataList.forEach(n -> System.out.println("***" + n.getDemo())
+      );
     }
   }
 }
